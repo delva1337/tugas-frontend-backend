@@ -1,43 +1,39 @@
 import express from "express";
 import cors from "cors";
+import path from "path";
 import mahasiswaRoutes from "./routes/mahasiswa.route";
-import mahasiswaDbRoutes from "./routes/mahasiswa-db.route";
+import prodiRoutes from "./routes/prodi.route";
 
 const app = express();
 
 app.use(
   cors({
     origin: "http://localhost:3001",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
 app.use(express.json());
 
+//middleware logging
 app.use((req, res, next) => {
   console.log(`[${new Date().toLocaleTimeString()}] ${req.method} ${req.url}`);
   next();
 });
 
+//static folder buat foto upload
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+
 app.get("/", (req, res) => {
-  res.json({ message: "Backend Express berjalan" });
+  res.json({ message: "backend Express berjalan" });
 });
 
 app.get("/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-app.get("/profile", (req, res) => {
-  res.json({ nama: "Zenith", role: "Mahasiswa", kampus: "Universitas Terbuka" });
-});
-
-app.get("/about", (req, res) => {
-  res.json({ app: "Express CRUD Mahasiswa", versi: "1.0.0" });
-});
-
-app.use("/api/mahasiswa-array", mahasiswaRoutes);
-
-app.use("/api/mahasiswa", mahasiswaDbRoutes);
+app.use("/api/prodi", prodiRoutes);
+app.use("/api/mahasiswa", mahasiswaRoutes);
 
 export default app;
